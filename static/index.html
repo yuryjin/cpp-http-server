@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ HTTP Server</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 40px 20px; }
+        h1 { font-size: 2rem; color: #7dd3fc; margin-bottom: 8px; }
+        .subtitle { color: #6b7280; margin-bottom: 40px; }
+        .card { background: #1c1f2e; border: 1px solid #2d3149; border-radius: 12px; padding: 24px; margin-bottom: 24px; max-width: 700px; }
+        h2 { font-size: 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        ul { list-style: none; }
+        ul li { padding: 6px 0; border-bottom: 1px solid #2d3149; font-family: monospace; }
+        ul li:last-child { border-bottom: none; }
+        .method { display: inline-block; width: 52px; font-weight: bold; }
+        .get  { color: #4ade80; }
+        .post { color: #fb923c; }
+        .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        button { padding: 8px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: opacity .2s; }
+        button:hover { opacity: 0.85; }
+        .btn-get  { background: #166534; color: #4ade80; }
+        .btn-post { background: #7c2d12; color: #fb923c; }
+        pre { background: #0f1117; border: 1px solid #2d3149; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; color: #a5f3fc; min-height: 60px; }
+    </style>
+</head>
+<body>
+    <h1>C++ HTTP Server</h1>
+    <p class="subtitle">Built from scratch — POSIX sockets, no frameworks.</p>
+
+    <div class="card">
+        <h2>Routes</h2>
+        <ul>
+            <li><span class="method get">GET</span> /</li>
+            <li><span class="method get">GET</span> /api/hello</li>
+            <li><span class="method post">POST</span> /api/echo</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Test</h2>
+        <div class="btn-row">
+            <button class="btn-get" onclick="testHello()">GET /api/hello</button>
+            <button class="btn-post" onclick="testEcho()">POST /api/echo</button>
+        </div>
+        <pre id="result">Click a button...</pre>
+    </div>
+
+    <script>
+        const out = document.getElementById('result');
+        async function testHello() {
+            const r = await fetch('/api/hello');
+            out.textContent = JSON.stringify(await r.json(), null, 2);
+        }
+        async function testEcho() {
+            const r = await fetch('/api/echo', {
+                method: 'POST',
+                body: JSON.stringify({ from: 'browser', ts: Date.now() }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            out.textContent = await r.text();
+        }
+    </script>
+</body>
+</html>

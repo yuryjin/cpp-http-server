@@ -1,13 +1,14 @@
 #include "http.hpp"
 #include <sstream>
+#include <unordered_map>
 
 std::string HttpResponse::serialize() const {
     std::ostringstream oss;
     oss << "HTTP/1.1 " << status_code << " " << status_text << "\r\n";
     for (auto& [k, v] : headers)
         oss << k << ": " << v << "\r\n";
-    oss << "Content-Length: " << body.size() << "\r\n";
-    oss << "Connection: close\r\n";
+    if (headers.find("Content-Length") == headers.end())
+        oss << "Content-Length: " << body.size() << "\r\n";
     oss << "\r\n" << body;
     return oss.str();
 }
@@ -85,4 +86,28 @@ HttpRequest parse_request(const std::string& raw) {
 
     req.body = raw.substr(header_end + 4);
     return req;
+}
+
+std::string mime_type(const std::string& path) {
+    static const std::unordered_map<std::string, std::string> types = {
+        {".html", "text/html; charset=utf-8"},
+        {".css",  "text/css"},
+        {".js",   "application/javascript"},
+        {".json", "application/json"},
+        {".png",  "image/png"},
+        {".jpg",  "image/jpeg"},
+        {".jpeg", "image/jpeg"},
+        {".gif",  "image/gif"},
+        {".svg",  "image/svg+xml"},
+        {".ico",  "image/x-icon"},
+        {".txt",  "text/plain"},
+        {".xml",  "application/xml"},
+        {".pdf",  "application/pdf"},
+        {".woff2","font/woff2"},
+        {".woff", "font/woff"},
+    };
+    auto dot = path.rfind('.');
+    if (dot == std::string::npos) return "application/octet-stream";
+    auto it = types.find(path.substr(dot));
+    return it != types.end() ? it->second : "application/octet-stream";
 }

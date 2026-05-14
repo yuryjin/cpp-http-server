@@ -27,3 +27,5 @@ struct HttpResponse {
 };
 
 HttpRequest parse_request(const std::string& raw);
+
+std::string mime_type(const std::string& path);
